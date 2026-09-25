@@ -1,9 +1,15 @@
-from pydantic import BaseModel, EmailStr
+from typing import Optional
+from pydantic import BaseModel
 
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    email: Optional[str] = None
+    username: Optional[str] = None
+    account: Optional[str] = None
     password: str
+
+    def get_identifier(self) -> str:
+        return (self.email or self.username or self.account or "").strip()
 
 
 class UserResponse(BaseModel):

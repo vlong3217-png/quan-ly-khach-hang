@@ -73,8 +73,6 @@ export function validateForm(data: LoginFormData): FormErrors {
 
   if (!data.email.trim()) {
     errors.email = 'Vui lòng nhập email hoặc tên đăng nhập.'
-  } else if (data.email.includes('@') && !EMAIL_REGEX.test(data.email)) {
-    errors.email = 'Email không đúng định dạng.'
   }
 
   if (!data.password) {
@@ -111,6 +109,7 @@ function LoginPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    e.stopPropagation()
 
     const validationErrors = validateForm(formData)
     if (Object.keys(validationErrors).length > 0) {
@@ -137,7 +136,13 @@ function LoginPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        setErrors({ general: data.detail || 'Email hoặc mật khẩu không đúng' })
+        let msg = 'Tài khoản hoặc mật khẩu không chính xác'
+        if (typeof data.detail === 'string') {
+          msg = data.detail
+        } else if (Array.isArray(data.detail) && data.detail[0]?.msg) {
+          msg = data.detail[0].msg
+        }
+        setErrors({ general: msg })
         return
       }
 

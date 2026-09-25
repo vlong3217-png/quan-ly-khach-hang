@@ -16,15 +16,23 @@ router = APIRouter(
     response_model=LoginResponse
 )
 def login(request: LoginRequest):
+    identifier = request.get_identifier()
+    if not identifier or not request.password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Tài khoản hoặc mật khẩu không chính xác"
+        )
+
     result = login_user(
-        email=request.email,
+        identifier=identifier,
         password=request.password
     )
     if not result:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Email hoặc mật khẩu không đúng"
+            detail="Tài khoản hoặc mật khẩu không chính xác"
         )
+
     return {
         "success": True,
         "access_token": result["access_token"],
