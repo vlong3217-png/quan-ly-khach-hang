@@ -405,6 +405,33 @@
   }
 }
 
+/* ---------- General Success Banner ---------- */
+.login-success-banner {
+  background: rgba(22, 163, 74, 0.08);
+  border: 1px solid rgba(22, 163, 74, 0.25);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: bannerSlideIn 0.3s ease;
+  margin-bottom: 4px;
+}
+
+.login-success-banner svg {
+  width: 16px;
+  height: 16px;
+  color: #16a34a;
+  flex-shrink: 0;
+}
+
+.login-success-banner span {
+  font-size: 13px;
+  color: #15803d;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 480px) {
   .login-page {

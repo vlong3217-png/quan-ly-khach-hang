@@ -92,6 +92,7 @@ function LoginPage() {
     rememberMe: false,
   })
   const [errors, setErrors] = useState<FormErrors>({})
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -118,26 +119,43 @@ function LoginPage() {
     }
 
     setErrors({})
+    setSuccessMessage(null)
     setIsLoading(true)
 
-    // Prepare payload for future API integration
-    const _loginPayload = {
-      email: formData.email.trim(),
-      password: formData.password,
-      rememberMe: formData.rememberMe,
-    }
-    void _loginPayload // Placeholder: sẽ gửi lên API khi Backend sẵn sàng
+    try {
+      const response = await fetch('http://127.0.0.1:8000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email.trim(),
+          password: formData.password,
+        }),
+      })
 
-    // TODO: Kết nối API đăng nhập tại đây
-    // Ví dụ: const response = await authService.login(_loginPayload)
-    // Nếu thành công: redirect người dùng
-    // Nếu thất bại: setErrors({ general: response.message })
+      const data = await response.json()
 
-    // Tạm thời chỉ tắt loading vì chưa có Backend API
-    // Khi có API, thay block này bằng API call thực tế
-    setTimeout(() => {
+      if (!response.ok) {
+        setErrors({ general: data.detail || 'Email hoặc mật khẩu không đúng' })
+        return
+      }
+
+      // Success
+      if (formData.rememberMe) {
+        localStorage.setItem('access_token', data.access_token)
+        localStorage.setItem('user', JSON.stringify(data.user))
+      } else {
+        sessionStorage.setItem('access_token', data.access_token)
+        sessionStorage.setItem('user', JSON.stringify(data.user))
+      }
+
+      setSuccessMessage(`Đăng nhập thành công! Chào mừng ${data.user.full_name}`)
+    } catch {
+      setErrors({ general: 'Không thể kết nối đến máy chủ Backend (http://127.0.0.1:8000)' })
+    } finally {
       setIsLoading(false)
-    }, 1500)
+    }
   }
 
   /* ---- Render ---- */
@@ -158,6 +176,14 @@ function LoginPage() {
           <div className="login-error-banner" role="alert" id="login-error-banner">
             <IconAlertCircle />
             <span>{errors.general}</span>
+          </div>
+        )}
+
+        {/* General success banner */}
+        {successMessage && (
+          <div className="login-success-banner" role="status" id="login-success-banner">
+            <IconCheck />
+            <span>{successMessage}</span>
           </div>
         )}
 
