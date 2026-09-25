@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:frontend": "node test_frontend_validation.mjs",
+    "test:e2e": "node test_e2e_integration.mjs",
+    "test": "node test_frontend_validation.mjs && node test_e2e_integration.mjs"
   },
   "dependencies": {
     "react": "^19.2.8",

@@ -66,9 +66,9 @@ const IconShield = () => (
 )
 
 /* ──────────── Validation helpers ──────────── */
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-function validateForm(data: LoginFormData): FormErrors {
+export function validateForm(data: LoginFormData): FormErrors {
   const errors: FormErrors = {}
 
   if (!data.email.trim()) {
