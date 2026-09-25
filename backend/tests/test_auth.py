@@ -21,8 +21,8 @@ def test_root():
     assert response.json() == {"message": "Customer Management API is running"}
 
 
-def test_login_success():
-    """Test login with valid admin credentials."""
+def test_login_success_with_email():
+    """Test login with valid admin email credentials."""
     response = client.post(
         "/auth/login",
         json={"email": "admin@gmail.com", "password": "123456"}
@@ -38,6 +38,18 @@ def test_login_success():
     assert data["user"]["id"] == 1
 
 
+def test_login_success_with_username():
+    """Test login with valid admin username credentials."""
+    response = client.post(
+        "/auth/login",
+        json={"username": "admin", "password": "123456"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert data["user"]["email"] == "admin@gmail.com"
+
+
 def test_login_wrong_password():
     """Test login with invalid password."""
     response = client.post(
@@ -46,27 +58,29 @@ def test_login_wrong_password():
     )
     assert response.status_code == 401
     data = response.json()
-    assert data["detail"] == "Email hoặc mật khẩu không đúng"
+    assert data["detail"] == "Tài khoản hoặc mật khẩu không chính xác"
 
 
-def test_login_wrong_email():
-    """Test login with non-existent email."""
+def test_login_wrong_email_or_username():
+    """Test login with non-existent email or username."""
     response = client.post(
         "/auth/login",
         json={"email": "nonexistent@gmail.com", "password": "123456"}
     )
     assert response.status_code == 401
     data = response.json()
-    assert data["detail"] == "Email hoặc mật khẩu không đúng"
+    assert data["detail"] == "Tài khoản hoặc mật khẩu không chính xác"
 
 
 def test_login_invalid_email_format():
-    """Test validation when email format is invalid."""
+    """Test login when identifier is not a standard email (treated as invalid account -> 401)."""
     response = client.post(
         "/auth/login",
         json={"email": "not-an-email", "password": "123456"}
     )
-    assert response.status_code == 422
+    assert response.status_code == 401
+    data = response.json()
+    assert data["detail"] == "Tài khoản hoặc mật khẩu không chính xác"
 
 
 def test_login_missing_fields():
@@ -75,7 +89,9 @@ def test_login_missing_fields():
         "/auth/login",
         json={"email": "admin@gmail.com"}
     )
-    assert response.status_code == 422
+    assert response.status_code == 401
+    data = response.json()
+    assert data["detail"] == "Tài khoản hoặc mật khẩu không chính xác"
 
 
 def test_security_hash_and_verify():

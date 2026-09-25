@@ -7,6 +7,7 @@ from app.core.security import (
 fake_user = {
     "id": 1,
     "email": "admin@gmail.com",
+    "username": "admin",
     "full_name": "Admin",
     "role": "ADMIN",
     "is_active": True,
@@ -15,26 +16,35 @@ fake_user = {
 
 
 def authenticate_user(
-    email: str,
+    identifier: str,
     password: str
 ):
-    if email != fake_user["email"]:
+    clean_identifier = (identifier or "").strip().lower()
+
+    # Check if identifier matches either email or username
+    if (
+        clean_identifier != fake_user["email"].lower()
+        and clean_identifier != fake_user["username"].lower()
+    ):
         return None
+
     if not verify_password(
         password,
         fake_user["hashed_password"]
     ):
         return None
+
     if not fake_user["is_active"]:
         return None
+
     return fake_user
 
 
 def login_user(
-    email: str,
+    identifier: str,
     password: str
 ):
-    user = authenticate_user(email, password)
+    user = authenticate_user(identifier, password)
     if not user:
         return None
 
